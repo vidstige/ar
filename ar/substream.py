@@ -8,12 +8,12 @@ class Substream(io.RawIOBase):
         self.p = 0
     
     def seek(self, offset, origin=0):
-        #print('seeking to: {}'.format(offset))
         if origin == 0:
             self.p = offset
         elif origin == 1:
             self.p += offset
-        # TODO: origin == 2
+        elif origin == 2:
+            self.p = self.size + offset
         else:
             raise ValueError("Unexpected origin: {}".format(origin))
 
