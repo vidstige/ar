@@ -2,7 +2,7 @@
 import struct
 from ar.substream import Substream
 
-magic = b"!<arch>\n"
+MAGIC = b"!<arch>\n"
 
 
 def padding(n, pad_size):
@@ -28,7 +28,7 @@ class ArPath(object):
 
     def get_stream(self, f):
         return Substream(f, self.offset, self.size)
-   
+
 
 class Archive(object):
     def __init__(self, f):
@@ -60,8 +60,8 @@ def lookup(data, offset):
 
 
 def load(stream):
-    actual = stream.read(len(magic))
-    if actual != magic:
+    actual = stream.read(len(MAGIC))
+    if actual != MAGIC:
         raise ArchiveError("Unexpected magic")
 
     fmt = '16s12s6s6s8s10sbb'
@@ -72,7 +72,7 @@ def load(stream):
         buffer = stream.read(struct.calcsize(fmt))
         if len(buffer) < struct.calcsize(fmt):
             break
-        name, timestamp, owner, group, mode, size, _, _ =  struct.unpack(fmt, buffer)
+        name, timestamp, owner, group, mode, size, _, _ = struct.unpack(fmt, buffer)
         name = name.decode().rstrip()
         size = int(size.decode().rstrip())
 
