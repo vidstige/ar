@@ -16,10 +16,10 @@ def list_archive(files):
 
 def cat_archive(archive, files):
     with open(archive, 'rb') as f:
-        with ar.Archive(f) as archive:
+        with ar.Archive(f) as the_archive:
             for filename in files:
                 shutil.copyfileobj(
-                    archive.open(filename),
+                    the_archive.open(filename),
                     sys.stdout.buffer)
 
 
