@@ -20,7 +20,7 @@ class ArchiveError(Exception):
     pass
 
 
-class ArPath(object):
+class ArPath:
     def __init__(self, name, offset, size):
         self.name = name
         self.offset = offset
@@ -30,7 +30,7 @@ class ArPath(object):
         return Substream(f, self.offset, self.size)
 
 
-class Archive(object):
+class Archive:
     def __init__(self, f):
         self.f = f
         self.entries = load(self.f)
