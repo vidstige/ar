@@ -1,6 +1,6 @@
 """Loads AR files"""
 import struct
-from pyar.substream import Substream
+from ar.substream import Substream
 
 magic = b"!<arch>\n"
 
