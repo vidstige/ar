@@ -2,18 +2,19 @@ import io
 
 class Substream(io.RawIOBase):
     def __init__(self, file: io.RawIOBase, start, size):
+        super().__init__()
         self.file = file
         self.start = start
         self.size = size
-        self.p = 0
-    
+        self.position = 0
+
     def seek(self, offset, origin=0):
         if origin == 0:
-            self.p = offset
+            self.position = offset
         elif origin == 1:
-            self.p += offset
+            self.position += offset
         elif origin == 2:
-            self.p = self.size + offset
+            self.position = self.size + offset
         else:
             raise ValueError("Unexpected origin: {}".format(origin))
 
@@ -21,12 +22,11 @@ class Substream(io.RawIOBase):
         if n is None:
             n = self.size
         prev = self.file.tell()
-        self.file.seek(self.start + self.p)
-        data = self.file.read(n if self.p + n <= self.size else self.size - self.p)
-        self.p += len(data)
+        self.file.seek(self.start + self.position)
+        data = self.file.read(n if self.position + n <= self.size else self.size - self.position)
+        self.position += len(data)
         self.file.seek(prev)
         return data
 
     def close(self):
-        #print('closing')
         pass
