@@ -46,10 +46,11 @@ class Archive(object):
 
     def open(self, path):
         arpath = path
-        if not isinstance(path, ArPath):
-            arpath = next(entry for entry in self.entries if entry.name == path)
+        if not isinstance(arpath, ArPath):
+            arpath = next((entry for entry in self.entries if entry.name == arpath), None)
+            if arpath is None:
+                raise ArchiveError('No such entry: {}'.format(arpath))
         return arpath.get_stream(self.f)
-        
 
 
 def lookup(data, offset):
