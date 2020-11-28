@@ -17,8 +17,9 @@ class Substream(io.RawIOBase):
         else:
             raise ValueError("Unexpected origin: {}".format(origin))
 
-    def read(self, n):
-        #print('read {}'.format(n))
+    def read(self, n=None):
+        if n is None:
+            n = self.size
         prev = self.file.tell()
         self.file.seek(self.start + self.p)
         data = self.file.read(n if self.p + n <= self.size else self.size - self.p)
