@@ -1,4 +1,6 @@
 import argparse
+import shutil
+import sys
 
 import ar
 
@@ -6,12 +8,19 @@ import ar
 def list_archive(files):
     for filename in files:
         with open(filename, 'rb') as f:
-            for entry in ar.load(f).entries:
-                print("{} {} - {}".format(entry.name, entry.offset, entry.size))
+            with ar.Archive(f) as archive:
+                for entry in archive:
+                    #print("{} {} - {}".format(entry.name, entry.offset, entry.size))
+                    print(entry.name)
 
 
-def cat_archive():
-    pass
+def cat_archive(archive, files):
+    with open(archive, 'rb') as f:
+        with ar.Archive(f) as archive:
+            for filename in files:
+                shutil.copyfileobj(
+                    archive.open(filename),
+                    sys.stdout.buffer)
 
 
 def main():
@@ -22,8 +31,9 @@ def main():
     list_parser.set_defaults(action=list_archive)
 
     cat_parser = subparsers.add_parser("cat")
-    cat_parser.add_argument('files', nargs='*', help="Files to load")
-    cat_parser.set_defaults(action=list_archive)
+    cat_parser.add_argument('archive', help="Archive file")
+    cat_parser.add_argument('files', nargs='*', help="Filenames inside archive")
+    cat_parser.set_defaults(action=cat_archive)
 
     args = vars(parser.parse_args())
     action = args.pop('action')

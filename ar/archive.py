@@ -20,7 +20,7 @@ class ArchiveError(Exception):
     pass
 
 
-class Entry(object):
+class ArPath(object):
     def __init__(self, name, offset, size):
         self.name = name
         self.offset = offset
@@ -31,14 +31,31 @@ class Entry(object):
    
 
 class Archive(object):
-    def __init__(self, entries):
-        self.entries = entries
+    def __init__(self, f):
+        self.f = f
+        self.entries = load(self.f)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def __iter__(self):
+        return self.entries
+
+    def open(self, path):
+        arpath = path
+        if not isinstance(path, ArPath):
+            arpath = next(entry for entry in self.entries if entry.name == path)
+        return arpath.get_stream(self.f)
+        
 
 
 def lookup(data, offset):
     start = offset
     end = data.index(b"\n", start)
-    return data[start:end-1].decode()
+    return data[start:end - 1].decode()
 
 
 def load(stream):
@@ -57,7 +74,6 @@ def load(stream):
         name, timestamp, owner, group, mode, size, _, _ =  struct.unpack(fmt, buffer)
         name = name.decode().rstrip()
         size = int(size.decode().rstrip())
-        #print("'{}': {} ({})".format(name, size, pad(size, 2)))
 
         if name == '/':
             stream.seek(pad(size, 2), 1)
@@ -70,10 +86,8 @@ def load(stream):
             expanded_name = lookup(lookup_data, o)
             offset = stream.tell()
             stream.seek(pad(size, 2), 1)
-            entries.append(Entry(expanded_name, offset, size))
+            yield ArPath(expanded_name, offset, size)
         else:
             offset = stream.tell()
             stream.seek(pad(size, 2), 1)
-            entries.append(Entry(name.rstrip('/'), offset, size))
-
-    return Archive(entries)
+            yield ArPath(name.rstrip('/'), offset, size)
