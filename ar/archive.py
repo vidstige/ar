@@ -67,12 +67,12 @@ def load(stream):
     fmt = '16s12s6s6s8s10sbb'
 
     lookup_data = None
-    entries = []
     while True:
         buffer = stream.read(struct.calcsize(fmt))
         if len(buffer) < struct.calcsize(fmt):
             break
         name, timestamp, owner, group, mode, size, _, _ = struct.unpack(fmt, buffer)
+        del timestamp, owner, group, mode
         name = name.decode().rstrip()
         size = int(size.decode().rstrip())
 
@@ -83,8 +83,8 @@ def load(stream):
             lookup_data = stream.read(size)
             stream.seek(padding(size, 2), 1)
         elif name.startswith('/'):
-            o = int(name[1:])
-            expanded_name = lookup(lookup_data, o)
+            lookup_offset = int(name[1:])
+            expanded_name = lookup(lookup_data, lookup_offset)
             offset = stream.tell()
             stream.seek(pad(size, 2), 1)
             yield ArPath(expanded_name, offset, size)
