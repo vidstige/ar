@@ -16,9 +16,10 @@ def simple_archive():
     TEST_DATA.mkdir(exist_ok=True)
 
     (TEST_DATA / 'file0.txt').write_text('Hello')
-    (TEST_DATA / 'file1.txt').write_text('World')
-    subprocess.check_call('ar r test.a file0.txt file1.txt'.split(), cwd=str(TEST_DATA))
+    (TEST_DATA / 'file1.bin').write_bytes(b'\xc3\x28')  # invalid utf-8 characters
+    subprocess.check_call('ar r test.a file0.txt file1.bin'.split(), cwd=str(TEST_DATA))
     return TEST_DATA / 'test.a'
+
 
 @pytest.fixture
 def bad_archive():
@@ -30,7 +31,7 @@ def bad_archive():
 def test_list(simple_archive):
     with simple_archive.open('rb') as f:
         archive = Archive(f)
-        assert ['file0.txt', 'file1.txt'] == [entry.name for entry in archive]
+        assert ['file0.txt', 'file1.bin'] == [entry.name for entry in archive]
 
 
 def test_read_content(simple_archive):
@@ -39,6 +40,13 @@ def test_read_content(simple_archive):
         file0 = archive.open('file0.txt')
         assert file0.read(1) == 'H'
         assert file0.read() == 'ello'
+
+
+def test_read_binary(simple_archive):
+    with simple_archive.open('rb') as f:
+        archive = Archive(f)
+        file0 = archive.open('file1.bin', 'rb')
+        assert file0.read() == b'\xc3\x28'
 
 
 def test_seek_basic(simple_archive):
