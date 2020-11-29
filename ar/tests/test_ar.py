@@ -17,7 +17,7 @@ def simple_archive():
 
     (TEST_DATA / 'file0.txt').write_text('Hello')
     (TEST_DATA / 'file1.txt').write_text('World')
-    subprocess.check_call('ar r test.a file0.txt file1.txt'.split(), cwd=TEST_DATA)
+    subprocess.check_call('ar r test.a file0.txt file1.txt'.split(), cwd=str(TEST_DATA))
     return TEST_DATA / 'test.a'
 
 @pytest.fixture
@@ -28,13 +28,13 @@ def bad_archive():
 
 
 def test_list(simple_archive):
-    with open(simple_archive, 'rb') as f:
+    with simple_archive.open('rb') as f:
         archive = Archive(f)
         assert ['file0.txt', 'file1.txt'] == [entry.name for entry in archive]
 
 
 def test_read_content(simple_archive):
-    with open(simple_archive, 'rb') as f:
+    with simple_archive.open('rb') as f:
         archive = Archive(f)
         file0 = archive.open('file0.txt')
         assert file0.read(1) == 'H'
@@ -42,7 +42,7 @@ def test_read_content(simple_archive):
 
 
 def test_seek_basic(simple_archive):
-    with open(simple_archive, 'rb') as f:
+    with simple_archive.open('rb') as f:
         archive = Archive(f)
         file0 = archive.open('file0.txt')
         file0.seek(1)
