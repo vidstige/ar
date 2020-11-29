@@ -9,9 +9,7 @@ MAGIC = b"!<arch>\n"
 
 def padding(n, pad_size):
     reminder = n % pad_size
-    if reminder:
-        return pad_size - n % pad_size
-    return 0
+    return pad_size - reminder if reminder else 0
 
 
 def pad(n, pad_size):
