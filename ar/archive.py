@@ -1,5 +1,7 @@
 """Loads AR files"""
 import struct
+import codecs
+
 from ar.substream import Substream
 
 MAGIC = b"!<arch>\n"
@@ -30,10 +32,21 @@ class ArPath:
         return Substream(f, self.offset, self.size)
 
 
+class Mode:
+    MODES = 'rbt'
+    def __init__(self, mode):
+        if any(character not in Mode.MODES for character in mode):
+            raise ValueError("invalid mode: '{}'".format(mode))
+        self._mode = mode
+
+    def is_binary(self):
+        return 'b' in self._mode
+
+
 class Archive:
     def __init__(self, f):
         self.f = f
-        self.entries = load(self.f)
+        self.entries = list(load(self.f))
 
     def __enter__(self):
         return self
@@ -42,15 +55,19 @@ class Archive:
         pass
 
     def __iter__(self):
-        return self.entries
+        return iter(self.entries)
 
-    def open(self, path):
+    def open(self, path, mode='r', encoding='utf-8'):
+        modef = Mode(mode)
         arpath = path
         if not isinstance(arpath, ArPath):
             arpath = next((entry for entry in self.entries if entry.name == arpath), None)
             if arpath is None:
                 raise ArchiveError('No such entry: {}'.format(arpath))
-        return arpath.get_stream(self.f)
+        binary = arpath.get_stream(self.f)
+        if modef.is_binary():
+            return binary
+        return codecs.getreader(encoding)(binary)
 
 
 def lookup(data, offset):
@@ -62,7 +79,7 @@ def lookup(data, offset):
 def load(stream):
     actual = stream.read(len(MAGIC))
     if actual != MAGIC:
-        raise ArchiveError("Unexpected magic")
+        raise ArchiveError("Unexpected magic: {magic}".format(magic=actual))
 
     fmt = '16s12s6s6s8s10sbb'
 
