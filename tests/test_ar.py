@@ -1,3 +1,4 @@
+# pylint: disable=redefined-outer-name
 import subprocess
 from pathlib import Path
 
@@ -13,11 +14,17 @@ TEST_DATA = Path('test_data/')
 def simple_archive():
     # Create archive
     TEST_DATA.mkdir(exist_ok=True)
-    
+
     (TEST_DATA / 'file0.txt').write_text('Hello')
     (TEST_DATA / 'file1.txt').write_text('World')
     subprocess.check_call('ar r test.a file0.txt file1.txt'.split(), cwd=TEST_DATA)
     return TEST_DATA / 'test.a'
+
+@pytest.fixture
+def bad_archive():
+    path = TEST_DATA / 'bad.a'
+    path.write_bytes(b'nope, not an ar file')
+    return path
 
 
 def test_open_file_list(simple_archive):
@@ -32,3 +39,10 @@ def test_open_file_read_content(simple_archive):
         file0 = archive.open('file0.txt')
         assert file0.read(1) == b'H'
         assert file0.read() == b'ello'
+
+
+def test_bad_file(bad_archive):
+    with bad_archive.open('rb') as f:
+        with pytest.raises(ArchiveError) as exception_info:
+            Archive(f)
+        assert str(exception_info.value) == "Unexpected magic: b'nope, no'"

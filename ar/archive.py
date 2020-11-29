@@ -62,7 +62,7 @@ def lookup(data, offset):
 def load(stream):
     actual = stream.read(len(MAGIC))
     if actual != MAGIC:
-        raise ArchiveError("Unexpected magic: '{magic}'".format(magic=actual))
+        raise ArchiveError("Unexpected magic: {magic}".format(magic=actual))
 
     fmt = '16s12s6s6s8s10sbb'
 
