@@ -27,18 +27,26 @@ def bad_archive():
     return path
 
 
-def test_open_file_list(simple_archive):
+def test_list(simple_archive):
     with open(simple_archive, 'rb') as f:
         archive = Archive(f)
         assert ['file0.txt', 'file1.txt'] == [entry.name for entry in archive]
 
 
-def test_open_file_read_content(simple_archive):
+def test_read_content(simple_archive):
     with open(simple_archive, 'rb') as f:
         archive = Archive(f)
         file0 = archive.open('file0.txt')
         assert file0.read(1) == b'H'
         assert file0.read() == b'ello'
+
+
+def test_seek_basic(simple_archive):
+    with open(simple_archive, 'rb') as f:
+        archive = Archive(f)
+        file0 = archive.open('file0.txt')
+        file0.seek(1)
+        assert file0.read(3) == b'ell'
 
 
 def test_bad_file(bad_archive):
