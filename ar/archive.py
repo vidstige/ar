@@ -33,7 +33,7 @@ class ArPath:
 class Archive:
     def __init__(self, f):
         self.f = f
-        self.entries = load(self.f)
+        self.entries = list(load(self.f))
 
     def __enter__(self):
         return self
@@ -42,7 +42,7 @@ class Archive:
         pass
 
     def __iter__(self):
-        return self.entries
+        return iter(self.entries)
 
     def open(self, path):
         arpath = path
@@ -62,7 +62,7 @@ def lookup(data, offset):
 def load(stream):
     actual = stream.read(len(MAGIC))
     if actual != MAGIC:
-        raise ArchiveError("Unexpected magic")
+        raise ArchiveError("Unexpected magic: '{magic}'".format(magic=actual))
 
     fmt = '16s12s6s6s8s10sbb'
 
