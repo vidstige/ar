@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/vidstige/ar.svg?branch=master)](https://travis-ci.com/vidstige/ar)
+
 # ar
 Python package for parsing ar archive file. 
 
