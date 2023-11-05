@@ -31,7 +31,7 @@ def bad_archive():
 def test_list(simple_archive):
     with simple_archive.open('rb') as f:
         archive = Archive(f)
-        assert ['file0.txt', 'file1.bin'] == [entry.name for entry in archive]
+        assert ['file0.txt', 'file1.bin'] == [entry.name for entry in archive if entry.name != '__.SYMDEF SORTED']
 
 
 def test_read_content(simple_archive):

@@ -91,6 +91,11 @@ def load(stream):
         name = name.decode().rstrip()
         size = int(size.decode().rstrip())
 
+        if name.startswith("#1/"):
+            namesize = int(name.split('/')[-1].strip())
+            name = stream.read(namesize).decode().split('\x00',1)[0]
+            stream.seek(-namesize, 1)
+
         if name == '/':
             stream.seek(pad(size, 2), 1)
         elif name == '//':
