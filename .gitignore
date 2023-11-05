@@ -3,6 +3,6 @@ __pycache__/
 
 /*.egg-info
 
-/test_data/
+**/test_data/
 /dist/
 /build/
