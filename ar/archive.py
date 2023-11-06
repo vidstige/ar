@@ -70,8 +70,12 @@ class Archive:
 
 def lookup(data, offset):
     start = offset
-    end = data.index(b"\n", start)
-    return data[start:end - 1].decode()
+    end = data.find(b"\n", start)
+    if end != -1:
+        end = end - 1
+    else:
+        end = data.find(b"\x00", start)
+    return data[start:end].decode()
 
 
 def load(stream):
