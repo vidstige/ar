@@ -30,3 +30,7 @@ class Substream(io.RawIOBase):
 
     def close(self):
         pass
+
+
+    def tell(self):
+      return self.file.tell()
