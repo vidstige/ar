@@ -16,7 +16,7 @@ class Substream(io.RawIOBase):
         elif origin == 2:
             self.position = self.size + offset
         else:
-            raise ValueError("Unexpected origin: {}".format(origin))
+            raise ValueError(f"Unexpected origin: {origin}")
 
     def read(self, n=None):
         if n is None:
