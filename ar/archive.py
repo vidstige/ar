@@ -34,7 +34,7 @@ class Mode:
     MODES = 'rbt'
     def __init__(self, mode):
         if any(character not in Mode.MODES for character in mode):
-            raise ValueError("invalid mode: '{}'".format(mode))
+            raise ValueError(f"invalid mode: '{mode}'")
         self._mode = mode
 
     def is_binary(self):
@@ -61,7 +61,7 @@ class Archive:
         if not isinstance(arpath, ArPath):
             arpath = next((entry for entry in self.entries if entry.name == arpath), None)
             if arpath is None:
-                raise ArchiveError('No such entry: {}'.format(arpath))
+                raise ArchiveError(f'No such entry: {path}')
         binary = arpath.get_stream(self.f)
         if modef.is_binary():
             return binary
@@ -77,7 +77,7 @@ def lookup(data, offset):
 def load(stream):
     actual = stream.read(len(MAGIC))
     if actual != MAGIC:
-        raise ArchiveError("Unexpected magic: {magic}".format(magic=actual))
+        raise ArchiveError(f"Unexpected magic: {actual}")
 
     fmt = '16s12s6s6s8s10sbb'
 
