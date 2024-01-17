@@ -14,7 +14,7 @@ Python package for parsing ar archive file.
 ## Usage
 List files inside `file.a`
 ```python
-with open('file.a') as f:
+with open('file.a', 'rb') as f:
   archive = Archive(f)
   for entry in archive:
     print(entry.name)
@@ -23,7 +23,7 @@ with open('file.a') as f:
 Read content of `file.txt` contained within `file.a`.
 
 ```python
-with open('file.a') as f:
+with open('file.a', 'rb') as f:
   archive = Archive(f)
   print(archive.open('file.txt').read())
 ```
