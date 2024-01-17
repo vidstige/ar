@@ -28,5 +28,18 @@ with open('file.a') as f:
   print(archive.open('file.txt').read())
 ```
 
+## Developing
+Create a virtual environment using python version of liking
+
+    python3.10 -m venv venv
+  
+Activate it
+
+    source venv/bin/activate
+
+Install package editable together with relevant optional dependencies
+
+    pip install -e '.[test,dev]'
+
 ## Author
 Samuel Carlsson

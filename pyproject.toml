@@ -1,0 +1,31 @@
+[project]
+name = "ar"
+version = "0.4"
+requires-python = ">=3.7"
+authors = [
+  {name = "Samuel Carlsson", email = "samuel.carlsson@gmail.com"},
+]
+description = "Access ar archive files (.a)!"
+readme = "README.md"
+keywords = ["ar", "archive", "library", "extract"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pylint ~=3.0.3",
+]
+
+test = [
+    "pytest ~=7.4.4",
+]
+
+[project.urls]
+Repository = "https://github.com/vidstige/ar/"
+"Bug Tracker" = "https://github.com/vidstige/ar/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
