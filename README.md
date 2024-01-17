@@ -14,7 +14,8 @@ Python package for parsing ar archive file.
 ## Usage
 List files inside `file.a`
 ```python
-with open('file.a') as f:
+from ar import Archive
+with open('file.a', 'rb') as f:
   archive = Archive(f)
   for entry in archive:
     print(entry.name)
@@ -23,10 +24,35 @@ with open('file.a') as f:
 Read content of `file.txt` contained within `file.a`.
 
 ```python
-with open('file.a') as f:
+from ar import Archive
+with open('file.a', 'rb') as f:
   archive = Archive(f)
   print(archive.open('file.txt').read())
 ```
+
+Extract all files:
+```python
+from ar import Archive
+with open('file.a', 'rb') as f:
+  archive = Archive(f)
+  for entry in archive:
+    with open(entry.name) as output:
+      content = entry.get_stream().read()
+      output.write(content)
+```
+
+## Developing
+Create a virtual environment using python version of liking
+
+    python3.10 -m venv venv
+  
+Activate it
+
+    source venv/bin/activate
+
+Install package editable together with relevant optional dependencies
+
+    pip install -e '.[test,dev]'
 
 ## Author
 Samuel Carlsson
