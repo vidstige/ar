@@ -28,6 +28,16 @@ with open('file.a') as f:
   print(archive.open('file.txt').read())
 ```
 
+Extract all files:
+```python
+with open('file.a', 'rb') as f:
+  archive = Archive(f)
+  for entry in archive:
+    with open(entry.name) as output:
+      content = entry.get_stream().read()
+      output.write(content)
+```
+
 ## Developing
 Create a virtual environment using python version of liking
 
