@@ -78,9 +78,9 @@ ENTRY_FORMAT = '16s12s6s6s8s10sbb'
 
 
 def load(stream):
-    actual = stream.read(len(MAGIC))
-    if actual != MAGIC:
-        raise ArchiveError(f"Unexpected magic: {actual}")
+    magic = stream.read(len(MAGIC))
+    if magic != MAGIC:
+        raise ArchiveError(f"Unexpected magic: {magic}")
 
     lookup_data = None
     while True:
