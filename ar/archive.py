@@ -74,19 +74,20 @@ def lookup(data, offset):
     return data[start:end - 1].decode()
 
 
+ENTRY_FORMAT = '16s12s6s6s8s10sbb'
+
+
 def load(stream):
     actual = stream.read(len(MAGIC))
     if actual != MAGIC:
         raise ArchiveError(f"Unexpected magic: {actual}")
 
-    fmt = '16s12s6s6s8s10sbb'
-
     lookup_data = None
     while True:
-        buffer = stream.read(struct.calcsize(fmt))
-        if len(buffer) < struct.calcsize(fmt):
+        buffer = stream.read(struct.calcsize(ENTRY_FORMAT))
+        if len(buffer) < struct.calcsize(ENTRY_FORMAT):
             break
-        name, timestamp, owner, group, mode, size, _, _ = struct.unpack(fmt, buffer)
+        name, timestamp, owner, group, mode, size, _, _ = struct.unpack(ENTRY_FORMAT, buffer)
         del timestamp, owner, group, mode
         name = name.decode().rstrip()
         size = int(size.decode().rstrip())
