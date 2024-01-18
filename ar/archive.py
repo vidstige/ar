@@ -79,6 +79,8 @@ ENTRY_FORMAT = '16s12s6s6s8s10sbb'
 
 def load(stream):
     magic = stream.read(len(MAGIC))
+    if not isinstance(magic, bytes):
+        raise ArchiveError("Stream must be binary")
     if magic != MAGIC:
         raise ArchiveError(f"Unexpected magic: {magic}")
 
