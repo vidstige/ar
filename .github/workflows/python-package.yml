@@ -31,6 +31,9 @@ jobs:
     - name: Lint with pylint
       run: |
         pylint ar
+    - name: mypy
+      run: |
+        mypy ar
     - name: Test with pytest
       run: |
         pytest
