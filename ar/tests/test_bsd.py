@@ -24,6 +24,13 @@ def test_read_content():
         assert file0.read() == 'ello'
 
 
+def test_read_content_long_filename():
+    with ARCHIVE.open('rb') as f:
+        archive = Archive(f)
+        file0 = archive.open('long-filename.txt')
+        assert file0.read(1) == 'l'
+        assert file0.read() == 'ong filename\n'
+
 def test_read_binary():
     with ARCHIVE.open('rb') as f:
         archive = Archive(f)
