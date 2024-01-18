@@ -103,6 +103,13 @@ def load(stream):
             offset = stream.tell()
             stream.seek(pad(size, 2), 1)
             yield ArPath(expanded_name, offset, size)
+        elif name.startswith('#1/'):
+            # BSD long filenames
+            name_length = int(name[len('#1/'):])
+            long_name = stream.read(name_length).rstrip(b'\00').decode()
+            offset = stream.tell()
+            stream.seek(pad(size - name_length, 2), 1)
+            yield ArPath(long_name, offset, size - name_length)
         else:
             offset = stream.tell()
             stream.seek(pad(size, 2), 1)
