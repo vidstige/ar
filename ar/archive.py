@@ -82,7 +82,7 @@ def load(stream):
     if not isinstance(magic, bytes):
         raise ArchiveError("Stream must be binary")
     if magic != MAGIC:
-        raise ArchiveError(f"Unexpected magic: {magic}")
+        raise ArchiveError(f"Unexpected magic: {magic!r}")
 
     lookup_data = None
     while True:
