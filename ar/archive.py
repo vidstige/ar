@@ -74,19 +74,22 @@ def lookup(data, offset):
     return data[start:end - 1].decode()
 
 
-def load(stream):
-    actual = stream.read(len(MAGIC))
-    if actual != MAGIC:
-        raise ArchiveError(f"Unexpected magic: {actual}")
+ENTRY_FORMAT = '16s12s6s6s8s10sbb'
 
-    fmt = '16s12s6s6s8s10sbb'
+
+def load(stream):
+    magic = stream.read(len(MAGIC))
+    if not isinstance(magic, bytes):
+        raise ArchiveError("Stream must be binary")
+    if magic != MAGIC:
+        raise ArchiveError(f"Unexpected magic: {magic!r}")
 
     lookup_data = None
     while True:
-        buffer = stream.read(struct.calcsize(fmt))
-        if len(buffer) < struct.calcsize(fmt):
+        buffer = stream.read(struct.calcsize(ENTRY_FORMAT))
+        if len(buffer) < struct.calcsize(ENTRY_FORMAT):
             break
-        name, timestamp, owner, group, mode, size, _, _ = struct.unpack(fmt, buffer)
+        name, timestamp, owner, group, mode, size, _, _ = struct.unpack(ENTRY_FORMAT, buffer)
         del timestamp, owner, group, mode
         name = name.decode().rstrip()
         size = int(size.decode().rstrip())
@@ -103,6 +106,13 @@ def load(stream):
             offset = stream.tell()
             stream.seek(pad(size, 2), 1)
             yield ArPath(expanded_name, offset, size)
+        elif name.startswith('#1/'):
+            # BSD long filenames
+            name_length = int(name[len('#1/'):])
+            long_name = stream.read(name_length).rstrip(b'\00').decode()
+            offset = stream.tell()
+            stream.seek(pad(size - name_length, 2), 1)
+            yield ArPath(long_name, offset, size - name_length)
         else:
             offset = stream.tell()
             stream.seek(pad(size, 2), 1)

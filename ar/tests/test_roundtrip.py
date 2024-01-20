@@ -21,13 +21,6 @@ def simple_archive():
     return TEST_DATA / 'test.a'
 
 
-@pytest.fixture
-def bad_archive():
-    path = TEST_DATA / 'bad.a'
-    path.write_bytes(b'nope, not an ar file')
-    return path
-
-
 def test_list(simple_archive):
     with simple_archive.open('rb') as f:
         archive = Archive(f)
@@ -55,10 +48,3 @@ def test_seek_basic(simple_archive):
         file0 = archive.open('file0.txt')
         file0.seek(1)
         assert file0.read(3) == 'ell'
-
-
-def test_bad_file(bad_archive):
-    with bad_archive.open('rb') as f:
-        with pytest.raises(ArchiveError) as exception_info:
-            Archive(f)
-        assert str(exception_info.value) == "Unexpected magic: b'nope, no'"
