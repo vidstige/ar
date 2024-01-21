@@ -39,6 +39,17 @@ def test_seek_basic():
         assert file0.read(3) == 'ell'
 
 
+def test_tell():
+    with ARCHIVE.open('rb') as f:
+        archive = Archive(f)
+        file0 = archive.open('file0.txt')
+        assert file0.tell() == 0
+        file0.read(2)
+        assert file0.tell() == 2
+        file0.read()
+        assert file0.tell() == 5
+
+
 def test_open_missing_path():
     with ARCHIVE.open('rb') as f:
         archive = Archive(f)
