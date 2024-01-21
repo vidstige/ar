@@ -2,6 +2,8 @@
 import subprocess
 from pathlib import Path
 
+import pytest
+
 from ar import Archive, ArchiveError
 
 
@@ -35,3 +37,11 @@ def test_seek_basic():
         file0 = archive.open('file0.txt')
         file0.seek(1)
         assert file0.read(3) == 'ell'
+
+
+def test_open_missing_path():
+    with ARCHIVE.open('rb') as f:
+        archive = Archive(f)
+        with pytest.raises(ArchiveError) as exception_info:
+            archive.open('missing')
+        assert str(exception_info.value) == "No such entry: missing"
