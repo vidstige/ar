@@ -30,3 +30,6 @@ class Substream(io.RawIOBase):
 
     def close(self):
         pass
+
+    def tell(self) -> int:
+        return self.position
