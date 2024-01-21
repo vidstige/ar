@@ -1,18 +1,20 @@
 """Loads AR files"""
 import struct
 import codecs
+from typing import BinaryIO, Iterable, Union
 
 from ar.substream import Substream
+
 
 MAGIC = b"!<arch>\n"
 
 
-def padding(n, pad_size):
+def padding(n: int, pad_size: int) -> int:
     reminder = n % pad_size
     return pad_size - reminder if reminder else 0
 
 
-def pad(n, pad_size):
+def pad(n: int, pad_size: int):
     return n + padding(n, pad_size)
 
 
@@ -21,7 +23,7 @@ class ArchiveError(Exception):
 
 
 class ArPath:
-    def __init__(self, name, offset, size):
+    def __init__(self, name: str, offset: int, size: int):
         self.name = name
         self.offset = offset
         self.size = size
@@ -37,7 +39,7 @@ class Mode:
             raise ValueError(f"invalid mode: '{mode}'")
         self._mode = mode
 
-    def is_binary(self):
+    def is_binary(self) -> bool:
         return 'b' in self._mode
 
 
@@ -55,20 +57,23 @@ class Archive:
     def __iter__(self):
         return iter(self.entries)
 
-    def open(self, path, mode='r', encoding='utf-8'):
+    def open(self, path: Union[str, ArPath], mode='r', encoding='utf-8'):
         modef = Mode(mode)
-        arpath = path
-        if not isinstance(arpath, ArPath):
-            arpath = next((entry for entry in self.entries if entry.name == arpath), None)
-            if arpath is None:
-                raise ArchiveError(f'No such entry: {path}')
+        if isinstance(path, ArPath):
+            arpath = path
+        else:
+            try:
+                arpath = next(entry for entry in self.entries if entry.name == path)
+            except StopIteration as e:
+                raise ArchiveError(f'No such entry: {path}') from e
+
         binary = arpath.get_stream(self.f)
         if modef.is_binary():
             return binary
         return codecs.getreader(encoding)(binary)
 
 
-def lookup(data, offset):
+def lookup(data: bytes, offset: int) -> str:
     start = offset
     end = data.index(b"\n", start)
     return data[start:end - 1].decode()
@@ -77,7 +82,7 @@ def lookup(data, offset):
 ENTRY_FORMAT = '16s12s6s6s8s10sbb'
 
 
-def load(stream):
+def load(stream: BinaryIO) -> Iterable[ArPath]:
     magic = stream.read(len(MAGIC))
     if not isinstance(magic, bytes):
         raise ArchiveError("Stream must be binary")
@@ -102,6 +107,8 @@ def load(stream):
             stream.seek(padding(size, 2), 1)
         elif name.startswith('/'):
             lookup_offset = int(name[1:])
+            if lookup_data is None:
+                raise ArchiveError("GNU long filename not allowed before lookup table")
             expanded_name = lookup(lookup_data, lookup_offset)
             offset = stream.tell()
             stream.seek(pad(size, 2), 1)
