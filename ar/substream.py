@@ -1,7 +1,7 @@
 import io
 
 class Substream(io.RawIOBase):
-    def __init__(self, file: io.RawIOBase, start, size):
+    def __init__(self, file: io.RawIOBase, start: int, size: int):
         super().__init__()
         self.file = file
         self.start = start
