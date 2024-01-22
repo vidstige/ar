@@ -75,7 +75,7 @@ class Archive:
 
 def lookup(data: bytes, offset: int) -> str:
     start = offset
-    end = data.index(b"\n", start)
+    end = data.find(b"\00", start)
     return data[start:end - 1].decode()
 
 
