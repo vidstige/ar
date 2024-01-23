@@ -1,6 +1,6 @@
 [project]
 name = "ar"
-version = "0.4"
+dynamic = ['version']
 requires-python = ">=3.7"
 authors = [
   {name = "Samuel Carlsson", email = "samuel.carlsson@gmail.com"},
@@ -28,5 +28,8 @@ Repository = "https://github.com/vidstige/ar/"
 "Bug Tracker" = "https://github.com/vidstige/ar/issues"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
