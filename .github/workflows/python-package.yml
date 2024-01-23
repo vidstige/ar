@@ -10,8 +10,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
-
+  verify:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -37,3 +36,44 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+  build:
+    name: Build distribution
+    needs:
+    - verify
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    - name: Install pypa/build
+      run: pip install build
+    - name: Build a binary wheel and a source tarball
+      run: python -m build
+    - name: Store the distribution packages
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/
+  
+  publish-to-pypi:
+    name: Publish to PyPI
+    if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
+    needs:
+    - build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/ar
+    permissions:
+      id-token: write
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: Publish distribution to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
