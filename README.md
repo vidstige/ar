@@ -38,8 +38,8 @@ from ar import Archive
 with open('file.a', 'rb') as f:
   archive = Archive(f)
   for entry in archive:
-    with open(entry.name) as output:
-      content = entry.get_stream().read()
+    with open(entry.name, 'wb') as output:
+      content = archive.open(entry, 'rb').read()
       output.write(content)
 ```
 
