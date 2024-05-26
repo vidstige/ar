@@ -1,3 +1,13 @@
 [version]
 source = "vcs"
 
+[build.targets.wheel]
+only-packages = true
+
+[build.targets.sdist]
+exclude = [
+  ".pylintrc",
+  ".github/workflows/",
+  "test_data/",
+  "tests/",
+]
