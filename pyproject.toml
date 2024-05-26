@@ -36,3 +36,12 @@ source = "vcs"
 
 [tool.hatch.build.targets.wheel]
 only-packages = true
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  ".pylintrc",
+  ".gitignore",
+  ".github/workflows/",
+  "test_data/",
+  "tests/",
+]
