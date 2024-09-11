@@ -76,8 +76,8 @@ class Archive:
 def lookup(data: bytes, offset: int) -> str:
     start = offset
     end = len(data)
-    for c in (b"\x2F", b"\x00"):
-        pos = data.find(c, start)
+    for delim in (b"\x2F", b"\x00"):
+        pos = data.find(delim, start)
         if pos >= 0:
             end = min(end, pos)
     return data[start:end].decode()
