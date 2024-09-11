@@ -74,13 +74,11 @@ class Archive:
 
 
 def lookup(data: bytes, offset: int) -> str:
-    start = offset
-    end = len(data)
-    for delim in (b"\x2F", b"\x00"):
-        pos = data.find(delim, start)
+    for delim in (b"\x00", b"\x2F"):
+        pos = data.find(delim, offset)
         if pos >= 0:
-            end = min(end, pos)
-    return data[start:end].decode()
+            data = data[offset:pos]
+    return data.decode()
 
 
 ENTRY_FORMAT = '16s12s6s6s8s10sbb'
