@@ -17,14 +17,16 @@ def simple_archive():
 
     (TEST_DATA / 'file0.txt').write_text('Hello')
     (TEST_DATA / 'file1.bin').write_bytes(b'\xc3\x28')  # invalid utf-8 characters
-    subprocess.check_call('ar r test.a file0.txt file1.bin'.split(), cwd=str(TEST_DATA))
+    (TEST_DATA / 'long_file_name_test0.txt').write_text('Hello2')
+    (TEST_DATA / 'long_file_name_test1.bin').write_bytes(b'\xc3\x28')
+    subprocess.check_call('ar r test.a file0.txt file1.bin long_file_name_test0.txt long_file_name_test1.bin'.split(), cwd=str(TEST_DATA))
     return TEST_DATA / 'test.a'
 
 
 def test_list(simple_archive):
     with simple_archive.open('rb') as f:
         archive = Archive(f)
-        assert ['file0.txt', 'file1.bin'] == [entry.name for entry in archive]
+        assert ['file0.txt', 'file1.bin', 'long_file_name_test0.txt', 'long_file_name_test1.bin'] == [entry.name for entry in archive]
 
 
 def test_read_content(simple_archive):
@@ -39,6 +41,20 @@ def test_read_binary(simple_archive):
     with simple_archive.open('rb') as f:
         archive = Archive(f)
         file0 = archive.open('file1.bin', 'rb')
+        assert file0.read() == b'\xc3\x28'
+
+def test_read_content_ext(simple_archive):
+    with simple_archive.open('rb') as f:
+        archive = Archive(f)
+        file0 = archive.open('long_file_name_test0.txt')
+        assert file0.read(2) == 'He'
+        assert file0.read() == 'llo2'
+
+
+def test_read_binary_ext(simple_archive):
+    with simple_archive.open('rb') as f:
+        archive = Archive(f)
+        file0 = archive.open('long_file_name_test1.bin', 'rb')
         assert file0.read() == b'\xc3\x28'
 
 
