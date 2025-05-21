@@ -18,6 +18,9 @@ class Substream(io.RawIOBase):
         else:
             raise ValueError(f"Unexpected origin: {origin}")
 
+    def seekable(self):
+        return True
+
     def read(self, n=None):
         if n is None:
             n = self.size
