@@ -7,10 +7,12 @@ authors = [
 ]
 description = "Access ar archive files (.a)!"
 readme = "README.md"
+license = {file = "LICENSE"}
 keywords = ["ar", "archive", "library", "extract"]
 classifiers = [
   "Development Status :: 4 - Beta",
-  "Programming Language :: Python"
+  "Programming Language :: Python",
+  "License :: OSI Approved :: Apache Software License",
 ]
 
 [project.optional-dependencies]

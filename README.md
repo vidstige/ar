@@ -56,5 +56,8 @@ Install package editable together with relevant optional dependencies
 
     pip install -e '.[test,dev]'
 
+## License
+Licensed under the [Apache License, Version 2.0](LICENSE).
+
 ## Author
 Samuel Carlsson
