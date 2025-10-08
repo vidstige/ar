@@ -7,6 +7,13 @@ from ar import Archive
 ARCHIVE = Path('test_data/linux.a')
 
 
+def test_seekable():
+    with ARCHIVE.open('rb') as f:
+        archive = Archive(f)
+        file0 = archive.open('file0.txt', 'r')
+        assert file0.seekable()
+
+
 def test_seek_from_start():
     with ARCHIVE.open('rb') as f:
         archive = Archive(f)
