@@ -4,7 +4,6 @@
 ![python-3.10](https://img.shields.io/badge/python-3.10-success)
 ![python-3.9](https://img.shields.io/badge/python-3.9-success)
 ![python-3.8](https://img.shields.io/badge/python-3.8-success)
-![python-3.7](https://img.shields.io/badge/python-3.7-success)
 
 
 # ar
