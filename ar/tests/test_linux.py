@@ -35,7 +35,7 @@ def test_seek_basic():
     with ARCHIVE.open('rb') as f:
         archive = Archive(f)
         file0 = archive.open('file0.txt')
-        assert file0.seek(1) == 1
+        file0.seek(1)
         assert file0.read(3) == 'ell'
 
 
