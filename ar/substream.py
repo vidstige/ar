@@ -8,7 +8,7 @@ class Substream(io.RawIOBase):
         self.size = size
         self.position = 0
 
-    def seek(self, offset, origin=0):
+    def seek(self, offset, origin=0) -> int:
         if origin == 0:
             self.position = offset
         elif origin == 1:
@@ -17,6 +17,7 @@ class Substream(io.RawIOBase):
             self.position = self.size + offset
         else:
             raise ValueError(f"Unexpected origin: {origin}")
+        return self.position
 
     def seekable(self):
         return True
