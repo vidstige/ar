@@ -1,3 +1,4 @@
+import errno
 import io
 
 class Substream(io.RawIOBase):
@@ -10,13 +11,18 @@ class Substream(io.RawIOBase):
 
     def seek(self, offset, origin=0) -> int:
         if origin == 0:
-            self.position = offset
+            position = offset
         elif origin == 1:
-            self.position += offset
+            position = self.position + offset
         elif origin == 2:
-            self.position = self.size + offset
+            position = self.size + offset
         else:
             raise ValueError(f"Unexpected origin: {origin}")
+
+        if position < 0 or position > self.size:
+            raise OSError(errno.EINVAL, "Invalid argument")
+
+        self.position = position
         return self.position
 
     def seekable(self):
