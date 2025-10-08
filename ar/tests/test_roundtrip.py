@@ -1,5 +1,6 @@
 # pylint: disable=redefined-outer-name
 import subprocess
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -12,15 +13,23 @@ TEST_DATA = Path('test_data/')
 
 @pytest.fixture
 def simple_archive():
-    # Create archive
-    TEST_DATA.mkdir(exist_ok=True)
+    archive_path = TEST_DATA / 'test.a'
+    if archive_path.exists():
+        return archive_path
 
-    (TEST_DATA / 'file0.txt').write_text('Hello')
-    (TEST_DATA / 'file1.bin').write_bytes(b'\xc3\x28')  # invalid utf-8 characters
-    (TEST_DATA / 'long_file_name_test0.txt').write_text('Hello2')
-    (TEST_DATA / 'long_file_name_test1.bin').write_bytes(b'\xc3\x28')
-    subprocess.check_call('ar r test.a file0.txt file1.bin long_file_name_test0.txt long_file_name_test1.bin'.split(), cwd=str(TEST_DATA))
-    return TEST_DATA / 'test.a'
+    archive_full_path = archive_path.resolve()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        (tmp_path / 'file0.txt').write_text('Hello')
+        (tmp_path / 'file1.bin').write_bytes(b'\xc3\x28')  # invalid utf-8 characters
+        (tmp_path / 'long_file_name_test0.txt').write_text('Hello2')
+        (tmp_path / 'long_file_name_test1.bin').write_bytes(b'\xc3\x28')
+        subprocess.check_call(
+            ['ar', 'r', str(archive_full_path), 'file0.txt', 'file1.bin', 'long_file_name_test0.txt', 'long_file_name_test1.bin'],
+            cwd=tmpdir,
+        )
+
+    return archive_path
 
 
 def test_list(simple_archive):
