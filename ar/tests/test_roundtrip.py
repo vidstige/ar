@@ -5,31 +5,24 @@ from pathlib import Path
 
 import pytest
 
-from ar import Archive, ArchiveError
+from ar import Archive
 
 
-TEST_DATA = Path('test_data/')
-
-
-@pytest.fixture
+@pytest.fixture(scope="module")
 def simple_archive():
-    archive_path = TEST_DATA / 'test.a'
-    if archive_path.exists():
-        return archive_path
-
-    archive_full_path = archive_path.resolve()
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
         (tmp_path / 'file0.txt').write_text('Hello')
         (tmp_path / 'file1.bin').write_bytes(b'\xc3\x28')  # invalid utf-8 characters
         (tmp_path / 'long_file_name_test0.txt').write_text('Hello2')
         (tmp_path / 'long_file_name_test1.bin').write_bytes(b'\xc3\x28')
+        archive = 'test.a'
         subprocess.check_call(
-            ['ar', 'r', str(archive_full_path), 'file0.txt', 'file1.bin', 'long_file_name_test0.txt', 'long_file_name_test1.bin'],
+            ['ar', 'r', archive, 'file0.txt', 'file1.bin', 'long_file_name_test0.txt', 'long_file_name_test1.bin'],
             cwd=tmpdir,
         )
 
-    return archive_path
+        yield tmp_path / archive
 
 
 def test_list(simple_archive):
